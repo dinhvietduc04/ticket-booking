@@ -89,7 +89,19 @@ export function audit(
   });
 }
 
-// Retry only database serialization conflicts. External provider calls must stay outside this helper.
+function isTransactionConflict(error: unknown) {
+  if (error instanceof Prisma.PrismaClientKnownRequestError)
+    return error.code === "P2034";
+
+  // Prisma 5 can expose PostgreSQL deadlocks/serialization failures as an
+  // unknown connector error instead of P2034, including on nested writes.
+  return (
+    error instanceof Prisma.PrismaClientUnknownRequestError &&
+    /PostgresError\s*\{\s*code:\s*"(?:40P01|40001)"/.test(error.message)
+  );
+}
+
+// Retry only database transaction conflicts. External provider calls must stay outside this helper.
 export async function serial<T>(
   prisma: PrismaService,
   fn: (tx: Prisma.TransactionClient) => Promise<T>,
@@ -101,12 +113,7 @@ export async function serial<T>(
         timeout: 15000,
       });
     } catch (error) {
-      if (
-        !(error instanceof Prisma.PrismaClientKnownRequestError) ||
-        error.code !== "P2034" ||
-        attempt >= 4
-      )
-        throw error;
+      if (!isTransactionConflict(error) || attempt >= 4) throw error;
     }
   }
 }
