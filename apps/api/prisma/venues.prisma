@@ -1,0 +1,55 @@
+model Venue {
+  id             String       @id @default(uuid())
+  organizationId String
+  name           String
+  description    String?
+  address        String
+  city           String
+  country        String
+  latitude       Decimal?
+  longitude      Decimal?
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  halls          Hall[]
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+
+  @@index([organizationId])
+  @@index([city])
+  @@map("venues")
+}
+
+model Hall {
+  id           String    @id @default(uuid())
+  venueId      String
+  name         String
+  capacity     Int
+  layoutConfig Json?
+  venue        Venue     @relation(fields: [venueId], references: [id], onDelete: Cascade)
+  seats        Seat[]
+  sessions     Session[]
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  @@unique([venueId, name])
+  @@index([venueId])
+  @@map("halls")
+}
+
+model Seat {
+  id           String        @id @default(uuid())
+  hallId       String
+  section      String        @default("MAIN")
+  row          String
+  number       Int
+  type         SeatType      @default(STANDARD)
+  x            Int
+  y            Int
+  hall         Hall          @relation(fields: [hallId], references: [id], onDelete: Cascade)
+  sessionSeats SessionSeat[]
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+
+  @@unique([hallId, row, number])
+  @@index([hallId])
+  @@map("seats")
+}

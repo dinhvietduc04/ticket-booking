@@ -1,0 +1,53 @@
+model User {
+  id                String               @id @default(uuid())
+  email             String               @unique
+  passwordHash      String
+  firstName         String
+  lastName          String
+  phone             String?
+  avatarUrl         String?
+  role              UserRole             @default(CUSTOMER)
+  emailVerified     Boolean              @default(false)
+  status            UserStatus           @default(ACTIVE)
+  organizationLinks OrganizationMember[]
+  holds             SeatHold[]
+  bookings          Booking[]
+  tickets           Ticket[]
+  queueEntries      WaitingEntry[]
+  createdAt         DateTime             @default(now())
+  updatedAt         DateTime             @updatedAt
+
+  @@map("users")
+}
+
+model Organization {
+  id          String               @id @default(uuid())
+  name        String
+  slug        String               @unique
+  logoUrl     String?
+  description String?
+  status      OrganizationStatus   @default(PENDING)
+  members     OrganizationMember[]
+  venues      Venue[]
+  events      Event[]
+  promotions Promotion[]
+  auditLogs AuditLog[]
+  createdAt   DateTime             @default(now())
+  updatedAt   DateTime             @updatedAt
+
+  @@map("organizations")
+}
+
+model OrganizationMember {
+  id             String           @id @default(uuid())
+  organizationId String
+  userId         String
+  role           OrganizationRole @default(STAFF)
+  organization   Organization     @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  user           User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt      DateTime         @default(now())
+
+  @@unique([organizationId, userId])
+  @@index([userId])
+  @@map("organization_members")
+}

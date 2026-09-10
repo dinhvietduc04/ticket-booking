@@ -1,0 +1,20 @@
+{
+  "extends": "../../packages/tsconfig/next.json",
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["./*"],
+      "@ticket-booking/contracts": ["../../packages/contracts/src/index.ts"]
+    },
+    "esModuleInterop": true,
+    "isolatedModules": true
+  },
+  "include": [
+    "**/*.ts",
+    "**/*.tsx",
+    ".next/types/**/*.ts",
+    "next-env.d.ts",
+    ".next-dev/types/**/*.ts"
+  ],
+  "exclude": ["node_modules"]
+}

@@ -1,0 +1,28 @@
+model Payment {
+  id                String          @id @default(uuid())
+  bookingId         String
+  provider          PaymentProvider @default(FAKE)
+  providerPaymentId String
+  amount            Int
+  refundedAmount    Int @default(0)
+  currency          String          @default("VND")
+  status            PaymentStatus   @default(PENDING)
+  failureReason     String?
+  booking           Booking         @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+  createdAt         DateTime        @default(now())
+  updatedAt         DateTime        @updatedAt
+
+  @@unique([provider, providerPaymentId])
+  @@index([bookingId])
+  @@map("payments")
+}
+
+model WebhookEvent {
+  id          String          @id @default(uuid())
+  provider    PaymentProvider
+  eventId     String
+  processedAt DateTime        @default(now())
+
+  @@unique([provider, eventId])
+  @@map("webhook_events")
+}

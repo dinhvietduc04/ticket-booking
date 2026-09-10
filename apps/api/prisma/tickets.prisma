@@ -1,0 +1,16 @@
+model Ticket {
+  id            String       @id @default(uuid())
+  ticketNumber  String       @unique
+  bookingItemId String       @unique
+  userId        String
+  qrCode        String       @unique
+  status        TicketStatus @default(VALID)
+  usedAt        DateTime?
+  bookingItem   BookingItem  @relation(fields: [bookingItemId], references: [id], onDelete: Cascade)
+  user          User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt     DateTime     @default(now())
+
+  @@index([userId])
+  @@index([ticketNumber])
+  @@map("tickets")
+}
