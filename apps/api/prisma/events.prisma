@@ -1,0 +1,72 @@
+model Event {
+  id             String        @id @default(uuid())
+  organizationId String
+  title          String
+  slug           String        @unique
+  description    String?
+  category       EventCategory
+  posterUrl      String?
+  bannerUrl      String?
+  status         EventStatus   @default(DRAFT)
+  saleStartAt    DateTime?
+  saleEndAt      DateTime?
+  refundPolicy   Json?
+  cancellation   EventCancellation?
+  organization   Organization  @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  sessions       Session[]
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+
+  @@index([organizationId])
+  @@index([status])
+  @@index([category])
+  @@map("events")
+}
+
+model Session {
+  id           String        @id @default(uuid())
+  eventId      String
+  hallId       String
+  startAt      DateTime
+  endAt        DateTime
+  status       SessionStatus @default(SCHEDULED)
+  waitingRoomCapacity Int @default(0)
+  admissionMinutes Int @default(10)
+  pricingRules Json?
+  queueEntries WaitingEntry[]
+  event        Event         @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  hall         Hall          @relation(fields: [hallId], references: [id], onDelete: Restrict)
+  sessionSeats SessionSeat[]
+  holds        SeatHold[]
+  bookings     Booking[]
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+
+  @@index([eventId])
+  @@index([hallId])
+  @@index([startAt])
+  @@index([status])
+  @@map("sessions")
+}
+
+model SessionSeat {
+  id           String            @id @default(uuid())
+  sessionId    String
+  seatId       String
+  price        Int
+  basePrice    Int?
+  currency     String            @default("VND")
+  status       SessionSeatStatus @default(AVAILABLE)
+  version      Int               @default(1)
+  session      Session           @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  seat         Seat              @relation(fields: [seatId], references: [id], onDelete: Cascade)
+  holdItems    SeatHoldItem[]
+  bookingItems BookingItem[]
+  createdAt    DateTime          @default(now())
+  updatedAt    DateTime          @updatedAt
+
+  @@unique([sessionId, seatId])
+  @@index([sessionId])
+  @@index([status])
+  @@map("session_seats")
+}

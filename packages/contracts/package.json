@@ -1,0 +1,22 @@
+{
+  "name": "@ticket-booking/contracts",
+  "private": true,
+  "version": "0.1.0",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "lint": "tsc --noEmit",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "zod": "^3.23.8"
+  },
+  "devDependencies": {
+    "@ticket-booking/tsconfig": "workspace:*",
+    "typescript": "^5.6.3"
+  }
+}

@@ -1,0 +1,88 @@
+model Promotion {
+  id String @id @default(uuid())
+  organizationId String
+  code String
+  type String
+  value Int
+  maxDiscount Int?
+  currency String @default("VND")
+  usageLimit Int
+  perUserLimit Int @default(1)
+  startsAt DateTime
+  endsAt DateTime
+  active Boolean @default(true)
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  bookings Booking[]
+  createdAt DateTime @default(now())
+  @@unique([organizationId, code])
+  @@map("promotions")
+}
+
+model Refund {
+  id String @id @default(uuid())
+  bookingId String
+  kind String
+  amount Int
+  currency String
+  reason String
+  actorId String?
+  providerRefundId String @unique
+  booking Booking @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+  @@unique([bookingId, kind])
+  @@map("refunds")
+}
+
+model EventCancellation {
+  id String @id @default(uuid())
+  eventId String @unique
+  actorId String
+  reason String
+  status String @default("PENDING")
+  lastError String?
+  event Event @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+  completedAt DateTime?
+  @@index([status])
+  @@map("event_cancellations")
+}
+
+model CustomerNotification {
+  id String @id @default(uuid())
+  bookingId String
+  kind String
+  message String
+  booking Booking @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+  @@unique([bookingId, kind])
+  @@map("customer_notifications")
+}
+
+model AuditLog {
+  id String @id @default(uuid())
+  organizationId String
+  actorId String
+  action String
+  targetId String
+  details Json
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+  @@index([organizationId, createdAt])
+  @@map("audit_logs")
+}
+
+model WaitingEntry {
+  id String @id @default(uuid())
+  sessionId String
+  userId String
+  sequence Int @unique @default(autoincrement())
+  token String @unique @default(uuid())
+  status String @default("WAITING")
+  admittedUntil DateTime?
+  createdAt DateTime @default(now())
+  session Session @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  @@unique([sessionId, userId])
+  @@index([sessionId, status, sequence])
+  @@map("waiting_entries")
+}

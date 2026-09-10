@@ -1,0 +1,13 @@
+node_modules
+.next
+.next-*
+dist
+coverage
+.env
+.env.local
+.turbo
+*.log
+*.tsbuildinfo
+
+playwright-report
+test-results

@@ -1,0 +1,23 @@
+{
+  "name": "ticket-booking",
+  "private": true,
+  "packageManager": "pnpm@9.12.3",
+  "scripts": {
+    "dev": "pnpm --parallel --filter @ticket-booking/api --filter @ticket-booking/web dev",
+    "dev:api": "pnpm --filter @ticket-booking/api dev",
+    "dev:web": "pnpm --filter @ticket-booking/web dev",
+    "build": "pnpm -r build",
+    "lint": "pnpm -r lint",
+    "typecheck": "pnpm -r typecheck",
+    "format": "prettier --write \"**/*.{ts,tsx,js,json,md,css,yml,yaml}\"",
+    "db:generate": "pnpm --filter @ticket-booking/api prisma:generate",
+    "db:migrate": "pnpm --filter @ticket-booking/api prisma:migrate",
+    "db:seed": "pnpm --filter @ticket-booking/api prisma:seed",
+    "db:seed:check": "pnpm --filter @ticket-booking/api prisma:seed:check",
+    "db:studio": "pnpm --filter @ticket-booking/api prisma:studio"
+  },
+  "devDependencies": {
+    "prettier": "^3.3.3",
+    "typescript": "^5.6.3"
+  }
+}
